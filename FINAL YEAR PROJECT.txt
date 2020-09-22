@@ -11,10 +11,6 @@ classdef exaduate < matlab.apps.AppBase
         BottomhatButton               matlab.ui.control.Button
         morphologicaltophatPanel      matlab.ui.container.Panel
         TophatButton                  matlab.ui.control.Button
-        step3markingPanel             matlab.ui.container.Panel
-        markButton                    matlab.ui.control.Button
-        step4accuracyPanel            matlab.ui.container.Panel
-        accuracyButton                matlab.ui.control.Button
         orginalimagePanel             matlab.ui.container.Panel
         Image                         matlab.ui.control.Image
         bottomhatPanel                matlab.ui.container.Panel
@@ -32,7 +28,6 @@ classdef exaduate < matlab.apps.AppBase
         gt2                           matlab.ui.control.Image
         GroundtruthOUTCOMEPanel       matlab.ui.container.Panel
         gt3                           matlab.ui.control.Image
-        UITable                       matlab.ui.control.Table
         noofvesselcorrectlypredictedpixelLabel  matlab.ui.control.Label
         EditField_3                   matlab.ui.control.NumericEditField
         noofvesselmissedinpixelLabel  matlab.ui.control.Label
@@ -134,7 +129,7 @@ classdef exaduate < matlab.apps.AppBase
 
         end
 
-        % Button pushed function: markButton
+        % Callback function
         function markButtonPushed(app, event)
         global h;
         global c;
@@ -147,7 +142,7 @@ classdef exaduate < matlab.apps.AppBase
          imshow(tmp);
         end
 
-        % Button pushed function: accuracyButton
+        % Callback function
         function accuracyButtonPushed(app, event)
         global x;
         global tmp;
@@ -557,36 +552,10 @@ end
             app.TophatButton.Position = [55 17 100 22];
             app.TophatButton.Text = 'Top hat';
 
-            % Create step3markingPanel
-            app.step3markingPanel = uipanel(app.imageprocessingPanel);
-            app.step3markingPanel.Title = 'step 3 : marking ';
-            app.step3markingPanel.FontWeight = 'bold';
-            app.step3markingPanel.Position = [12 379 172 88];
-
-            % Create markButton
-            app.markButton = uibutton(app.step3markingPanel, 'push');
-            app.markButton.ButtonPushedFcn = createCallbackFcn(app, @markButtonPushed, true);
-            app.markButton.BackgroundColor = [0.851 0.3255 0.098];
-            app.markButton.Position = [36 33 100 22];
-            app.markButton.Text = 'mark';
-
-            % Create step4accuracyPanel
-            app.step4accuracyPanel = uipanel(app.imageprocessingPanel);
-            app.step4accuracyPanel.Title = 'step 4: accuracy';
-            app.step4accuracyPanel.FontWeight = 'bold';
-            app.step4accuracyPanel.Position = [197 379 210 88];
-
-            % Create accuracyButton
-            app.accuracyButton = uibutton(app.step4accuracyPanel, 'push');
-            app.accuracyButton.ButtonPushedFcn = createCallbackFcn(app, @accuracyButtonPushed, true);
-            app.accuracyButton.BackgroundColor = [0.851 0.3255 0.098];
-            app.accuracyButton.Position = [39 33 100 22];
-            app.accuracyButton.Text = {'accuracy'; ''};
-
             % Create orginalimagePanel
             app.orginalimagePanel = uipanel(app.imageprocessingPanel);
             app.orginalimagePanel.Title = 'orginal image ';
-            app.orginalimagePanel.Position = [12 162 194 200];
+            app.orginalimagePanel.Position = [12 251 194 200];
 
             % Create Image
             app.Image = uiimage(app.orginalimagePanel);
@@ -597,7 +566,7 @@ end
             % Create bottomhatPanel
             app.bottomhatPanel = uipanel(app.imageprocessingPanel);
             app.bottomhatPanel.Title = 'bottom hat';
-            app.bottomhatPanel.Position = [230 162 188 200];
+            app.bottomhatPanel.Position = [219 251 188 200];
 
             % Create Image5
             app.Image5 = uiimage(app.bottomhatPanel);
@@ -668,12 +637,6 @@ end
             app.gt3 = uiimage(app.GroundtruthOUTCOMEPanel);
             app.gt3.Position = [-13 13 215 127];
 
-            % Create UITable
-            app.UITable = uitable(app.imageprocessingPanel);
-            app.UITable.ColumnName = {'IMAGE'; 'NON VESSEL'; 'VESSEL'; 'TOTAL'};
-            app.UITable.RowName = {};
-            app.UITable.Position = [666 123 302 95];
-
             % Create noofvesselcorrectlypredictedpixelLabel
             app.noofvesselcorrectlypredictedpixelLabel = uilabel(app.imageprocessingPanel);
             app.noofvesselcorrectlypredictedpixelLabel.Position = [904 584 218 22];
@@ -735,7 +698,7 @@ end
             app.UITable_2 = uitable(app.imageprocessingPanel);
             app.UITable_2.ColumnName = {''; 'NON-VESSEL'; 'VESSEL'; ''};
             app.UITable_2.RowName = {};
-            app.UITable_2.Position = [48 23 369 95];
+            app.UITable_2.Position = [12 110 369 95];
 
             % Create stateEditFieldLabel
             app.stateEditFieldLabel = uilabel(app.imageprocessingPanel);

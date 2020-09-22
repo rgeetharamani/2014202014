@@ -1,0 +1,779 @@
+classdef exaduate < matlab.apps.AppBase
+
+    % Properties that correspond to app components
+    properties (Access = public)
+        UIFigure                      matlab.ui.Figure
+        imageprocessingPanel          matlab.ui.container.Panel
+        Step1colorchannelsPanel       matlab.ui.container.Panel
+        SELECTIMAGEButton             matlab.ui.control.Button
+        COLORCHANNELSButton           matlab.ui.control.Button
+        step2MorphologicalbottomhatPanel  matlab.ui.container.Panel
+        BottomhatButton               matlab.ui.control.Button
+        morphologicaltophatPanel      matlab.ui.container.Panel
+        TophatButton                  matlab.ui.control.Button
+        step3markingPanel             matlab.ui.container.Panel
+        markButton                    matlab.ui.control.Button
+        step4accuracyPanel            matlab.ui.container.Panel
+        accuracyButton                matlab.ui.control.Button
+        orginalimagePanel             matlab.ui.container.Panel
+        Image                         matlab.ui.control.Image
+        bottomhatPanel                matlab.ui.container.Panel
+        Image5                        matlab.ui.control.Image
+        bloodvesslesegmentationPanel  matlab.ui.container.Panel
+        choseimageButton              matlab.ui.control.Button
+        groundtruthButton             matlab.ui.control.Button
+        performancevalidationButton   matlab.ui.control.Button
+        overallperformanceButton      matlab.ui.control.Button
+        tophatPanel                   matlab.ui.container.Panel
+        Image5_2                      matlab.ui.control.Image
+        orginalimagePanel_2           matlab.ui.container.Panel
+        gt1                           matlab.ui.control.Image
+        groundtruthPanel              matlab.ui.container.Panel
+        gt2                           matlab.ui.control.Image
+        GroundtruthOUTCOMEPanel       matlab.ui.container.Panel
+        gt3                           matlab.ui.control.Image
+        UITable                       matlab.ui.control.Table
+        noofvesselcorrectlypredictedpixelLabel  matlab.ui.control.Label
+        EditField_3                   matlab.ui.control.NumericEditField
+        noofvesselmissedinpixelLabel  matlab.ui.control.Label
+        EditField_2                   matlab.ui.control.NumericEditField
+        accucacycorrctlypredictedinpercentageLabel  matlab.ui.control.Label
+        EditField_4                   matlab.ui.control.NumericEditField
+        sesitivityEditFieldLabel      matlab.ui.control.Label
+        sesitivityEditField           matlab.ui.control.EditField
+        noofvesselpredictedwronglyEditFieldLabel  matlab.ui.control.Label
+        noofvesselpredictedwronglyEditField  matlab.ui.control.NumericEditField
+        specificityEditFieldLabel     matlab.ui.control.Label
+        specificityEditField          matlab.ui.control.EditField
+        UITable_2                     matlab.ui.control.Table
+        stateEditFieldLabel           matlab.ui.control.Label
+        stateEditField                matlab.ui.control.EditField
+    end
+
+    % Callbacks that handle component events
+    methods (Access = private)
+
+        % Button pushed function: SELECTIMAGEButton
+        function SELECTIMAGEButtonPushed(app, event)
+       
+            global x;
+            global b;
+            global a;
+            global t;
+            %for select file
+            [a,b]=uigetfile();
+           
+            x=strcat(b,a);
+             x=imread(x);
+             %image resize
+            x=imresize(x,[512 512]);
+           app.Image.ImageSource=x;
+            
+        end
+
+        % Button pushed function: COLORCHANNELSButton
+        function COLORCHANNELSButtonPushed(app, event)
+        global x;
+        global R;
+        global G;
+        global B;
+        global t;
+        global a;
+        global b;
+           %Extracting color channels
+           % Red channel
+           R=x(:,:,1);
+           figure,
+           imshow(R);
+           % Green channel 
+           G=x(:,:,2);
+            figure,
+           imshow(G);
+          
+           % Blue channel
+           B=x(:,:,3);
+           figure,
+           imshow(B)
+           %display  the image
+            
+          imwrite(R,'ex1.jpg');
+          imwrite(G,'ex2.jpg');
+          imwrite(B,'ex3.jpg');
+           imshow(G);
+           
+           
+           
+           
+        end
+
+        % Button pushed function: BottomhatButton
+        function BottomhatButtonPushed(app, event)
+           global G;
+           global c;
+           se=strel('disk',5);
+           %morphological bottomhat operation
+            c=imbothat(G,se);
+              imwrite(c,'ex4.jpg');
+              figure,
+              imshow(c);
+             
+        app.Image5.ImageSource='E:\MatlabProject\GT app\ex4.jpg';
+           
+        end
+
+        % Button pushed function: TophatButton
+        function TophatButtonPushed(app, event)
+            global G;
+            global h;
+            se=strel('disk',8);
+              %morphological Tophat operation
+            h=imtophat(G,se);
+            imwrite(h,'ex5.jpg');
+        app.Image5_2.ImageSource='E:\MatlabProject\GT app\ex5.jpg';
+
+
+        end
+
+        % Button pushed function: markButton
+        function markButtonPushed(app, event)
+        global h;
+        global c;
+        global x;
+        global tmp;
+         tmp=h-c;
+         %predicted groudtruth
+           imwrite(tmp,'predicted_ex.jpg');
+           %display predicted ground truth
+         imshow(tmp);
+        end
+
+        % Button pushed function: accuracyButton
+        function accuracyButtonPushed(app, event)
+        global x;
+        global tmp;
+        global a;
+        global b;
+        global G;
+        global h;
+   str = a;
+newStr = extractBetween(str,1,8)
+a1="_EX";
+news=strcat(newStr,a1);
+path=strcat(b,news);
+path=strcat(path,".tif");
+gt=imread(path);
+imwrite(gt,'gt_ex.jpg');
+tmp=imresize(tmp,[512 512]);
+gt=imresize(gt,[512 512]);
+imshow(tmp);
+        end
+
+        % Button pushed function: choseimageButton
+        function choseimageButtonPushed(app, event)
+             global x;
+            global b;
+            global a;
+            global t;
+            [a,b]=uigetfile();
+           
+            x=strcat(b,a);
+            x=imread(x);
+          handles=guidata(gcbo);
+            x=imresize(x, [584 565]);
+          app.gt1.ImageSource=x;
+        end
+
+        % Button pushed function: groundtruthButton
+        function groundtruthButtonPushed(app, event)
+            global x;
+            global a;
+            global b;
+            global out;
+            global gt;
+            pblack=0;
+            pwhite=0;
+            
+
+            gblack=0;
+            gwhite=0;
+            im=im2double(x);
+            
+            B1=imread("01_test_mask.gif");
+%B1=imresize(B1, [584 565]);
+lab = rgb2lab(im);
+f = 0;
+%image reshapeing
+wlab = reshape(bsxfun(@times,cat(3,1-f,f/2,f/2),lab),[],3);
+[C,S] = pca(wlab);
+S = reshape(S,size(lab));
+%selecting the red channel
+S = S(:,:,1);
+gray = (S-min(S(:)))./(max(S(:))-min(S(:)));
+%% Contrast Enhancment of gray image using CLAHE
+J = adapthisteq(gray,'numTiles',[8 8],'nBins',128);
+%% Background Exclusion
+% Apply Average Filter
+h = fspecial('average', [9 9]);
+JF = imfilter(J, h);
+figure, imshow(JF)
+% Take the difference between the gray image and Average Filter
+Z = imsubtract(JF, J);
+figure, imshow(Z)
+%% Threshold usinhe IsoData Method
+%level=isodata(Z) 
+% this is our threshold level
+level = graythresh(Z)
+%% Convert to Binary
+BW = im2bw(Z, level-.030)
+figure,
+imshow(BW);
+%% Remove small pixels
+BW2 = bwareaopen(BW, 200);
+figure,
+imshow(BW2);
+%% Overlay
+BW2 = imcomplement(BW2)
+out = imoverlay(B1, BW2 ,[0 0 0])
+figure, imshow(out)
+imwrite(out,'new1.jpg');
+app.gt3.ImageSource="E:\MatlabProject\GT app\new1.jpg";
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ str = a;
+newStr = extractBetween(str,1,2)
+a1="_manual1";
+news=strcat(newStr,a1);
+path=strcat(b,news);
+path=strcat(path,".gif");
+gt=imread(path);
+imshow(gt);
+app.gt2.ImageSource=path;
+
+        end
+
+        % Button pushed function: performancevalidationButton
+        function performancevalidationButtonPushed(app, event)
+            global out;
+        global gt;
+        temp=0;
+        pblack=0;
+        pwhite=0;
+        gblack=0;
+        gwhite=0;
+        global vv;
+        global vnv;
+        global nvnv;
+        global nvv;
+        vv=0;
+        vnv=0;
+        nvnv=0;
+       nvv=0;
+ temp1=0;
+[row, col] = size(gt(:,:,1));
+%distance = zeros(row, col);
+t1=3;
+ for x = 1 : row          
+     for y = 1 : col
+         if ((gt(x,y)==255) && (out(x,y)==255))
+             vv=vv+1;
+            
+         end
+         if ((gt(x,y)==255) && (out(x,y)==0))
+            vnv=vnv+1;
+         end
+         if((gt(x,y)==0)&&(out(x,y)==0))
+             nvnv=nvnv+1;
+         end
+         if((gt(x,y)==0)&&(out(x,y)==255))
+            nvv=nvv+1;
+         end
+         
+         if(out(x,y)==255)
+             pwhite=pwhite+1;
+         end
+         if(out(x,y)==0)
+             pblack =pblack+1;
+         end
+         if(gt(x,y)==255)
+             gwhite=gwhite+1;
+         end
+         if(gt(x,y)==0)
+             gblack =gblack+1;
+         end
+         total=584*565
+   
+      end
+ end 
+ te=pblack-gblack;
+ te2=gwhite-pwhite;
+ %writing into ui table
+    app.UITable_2.Data={'NV',nvnv,nvv,''
+        'V',vnv,vv,''};
+    if(pwhite>1500)
+        app.stateEditField.Value="diabetic";
+    else
+        app.stateEditField.Value="normal";
+    end
+crt=pwhite;
+miss=gwhite-pwhite;
+app.EditField_3.Value=vv;
+app.EditField_2.Value=vnv;
+app.noofvesselpredictedwronglyEditField.Value=nvv;
+accuracy=(pwhite/gwhite)*100;
+%%%%%%%%%%%%%%%%%
+TP=pblack;
+FN=te;
+FP=te2;
+TN=gwhite;
+%sensitivity = TP / (TP + FN);
+%specificity = TN / (FP + TN);
+sensitivity = nvnv / (nvnv + vnv);
+specificity = vv / (nvv + vv);
+
+%%%%%%%%%
+app.EditField_2.Value=accuracy;
+disp(sensitivity);
+disp(specificity);
+app.sesitivityEditField.Value=num2str(sensitivity);
+app.specificityEditField.Value=num2str(specificity);
+        end
+
+        % Button pushed function: overallperformanceButton
+        function overallperformanceButtonPushed(app, event)
+            for i=1:9
+                  global x;
+            global b;
+            global a;
+            global t;
+            global out;
+            global gt;
+                    global vv;
+        global vnv;
+        global nvnv;
+        global nvv;
+        vv=0;
+        vnv=0;
+        nvnv=0;
+       nvv=0;
+       
+           
+           a=strcat('0',num2str(i));
+           a=strcat(a,'_test.tif');
+            x=strcat(b,a);
+            x=imread(x);
+             gt=strcat('0',num2str(i));
+           gt=strcat(gt,'_manual1.gif');
+           gt=strcat(b,gt);
+           gt=imread(gt);
+           im=im2double(x);
+           
+            mask=strcat('0',num2str(i));
+               mask=strcat(mask,'_test_mask.gif');
+        
+            B1=imread(mask);
+
+       %%%-----------------------------------------
+       [row, col] = size(gt(:,:,1));
+   for x = 1 : row          
+     for y = 1 : col
+         if ((gt(x,y)==255) && (out(x,y)==255))
+             vv=vv+1;
+            
+         end
+         if ((gt(x,y)==255) && (out(x,y)==0))
+            vnv=vnv+1;
+         end
+         if((gt(x,y)==0)&&(out(x,y)==0))
+             nvnv=nvnv+1;
+         end
+         if((gt(x,y)==0)&&(out(x,y)==255))
+            nvv=nvv+1;
+         end
+     end 
+   end
+       
+sensitivity = nvnv / (nvnv + vnv);
+specificity = vv / (nvv + vv);
+       
+       
+%B1=imresize(B1, [584 565]);
+lab = rgb2lab(im);
+f = 0;
+wlab = reshape(bsxfun(@times,cat(3,1-f,f/2,f/2),lab),[],3);
+[C,S] = pca(wlab);
+S = reshape(S,size(lab));
+S = S(:,:,1);
+gray = (S-min(S(:)))./(max(S(:))-min(S(:)));
+%% Contrast Enhancment of gray image using CLAHE
+J = adapthisteq(gray,'numTiles',[8 8],'nBins',128);
+%% Background Exclusion
+% Apply Average Filter
+h = fspecial('average', [9 9]);
+JF = imfilter(J, h);
+%-----figure, imshow(JF)
+% Take the difference between the gray image and Average Filter
+Z = imsubtract(JF, J);
+%-----figure, imshow(Z)
+%% Threshold usinhe IsoData Method
+%level=isodata(Z) 
+% this is our threshold level
+level = graythresh(Z)
+%% Convert to Binary
+BW = im2bw(Z, level-.030)
+%%%figure,
+%%%%%%%%%%%%%%%%%%%%%%%%imshow(BW);
+%% Remove small pixels
+BW2 = bwareaopen(BW, 200);
+%%%figure,
+%%%%%%%%%%%%%%%%%%%%%%%%imshow(BW2);
+%% Overlay
+BW2 = imcomplement(BW2)
+out = imoverlay(B1, BW2 ,[0 0 0])
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+temp=0;
+        pblack=0;
+        pwhite=0;
+        gblack=0;
+        gwhite=0;
+        
+temp1=0;
+[row, col] = size(gt(:,:,1));
+%distance = zeros(row, col);
+t1=3;
+ for x = 1 : row          
+     for y = 1 : col
+         if ((gt(x,y)==255) && (out(x,y)==255))
+             temp=temp+1;
+             
+         end
+         if ((gt(x,y)==0) && (out(x,y)==0))
+            temp1=temp1+1;
+         end
+         if(gt(x,y)~=out(x,y))
+             disp(x);
+             disp(y);
+             
+         end
+         if(out(x,y)==255)
+             pwhite=pwhite+1;
+         end
+         if(out(x,y)==0)
+             pblack =pblack+1;
+         end
+         if(gt(x,y)==255)
+             gwhite=gwhite+1;
+         end
+         if(gt(x,y)==0)
+             gblack =gblack+1;
+         end
+         total=584*565
+         
+      end
+ end 
+crt=pwhite;
+miss=gwhite-pwhite;
+accuracy=(pwhite/gwhite)*100;
+j=i+1;
+l1=strcat('A',num2str(j));
+      l2=strcat('I',num2str(j));
+     
+      range=strcat(l1,':');
+      range=strcat(range,l2);
+      disp(range);
+      %writing into xlsx 
+     xlswrite('accuracytable.xlsx',{a,pwhite,pblack,total,accuracy,miss,crt,sensitivity,specificity},range,'append'); 
+
+end
+        end
+    end
+
+    % Component initialization
+    methods (Access = private)
+
+        % Create UIFigure and components
+        function createComponents(app)
+
+            % Create UIFigure and hide until all components are created
+            app.UIFigure = uifigure('Visible', 'off');
+            app.UIFigure.Position = [100 100 1347 674];
+            app.UIFigure.Name = 'UI Figure';
+
+            % Create imageprocessingPanel
+            app.imageprocessingPanel = uipanel(app.UIFigure);
+            app.imageprocessingPanel.Title = 'image processing ';
+            app.imageprocessingPanel.BackgroundColor = [0.6706 0.5412 0.5412];
+            app.imageprocessingPanel.FontWeight = 'bold';
+            app.imageprocessingPanel.Position = [11 17 1321 658];
+
+            % Create Step1colorchannelsPanel
+            app.Step1colorchannelsPanel = uipanel(app.imageprocessingPanel);
+            app.Step1colorchannelsPanel.Title = 'Step 1:(color channels)';
+            app.Step1colorchannelsPanel.BackgroundColor = [0.8 0.8 0.8];
+            app.Step1colorchannelsPanel.FontWeight = 'bold';
+            app.Step1colorchannelsPanel.Position = [12 477 172 141];
+
+            % Create SELECTIMAGEButton
+            app.SELECTIMAGEButton = uibutton(app.Step1colorchannelsPanel, 'push');
+            app.SELECTIMAGEButton.ButtonPushedFcn = createCallbackFcn(app, @SELECTIMAGEButtonPushed, true);
+            app.SELECTIMAGEButton.BackgroundColor = [0.851 0.3255 0.098];
+            app.SELECTIMAGEButton.FontWeight = 'bold';
+            app.SELECTIMAGEButton.Position = [22 65 122 44];
+            app.SELECTIMAGEButton.Text = {'SELECT IMAGE'; ''};
+
+            % Create COLORCHANNELSButton
+            app.COLORCHANNELSButton = uibutton(app.Step1colorchannelsPanel, 'push');
+            app.COLORCHANNELSButton.ButtonPushedFcn = createCallbackFcn(app, @COLORCHANNELSButtonPushed, true);
+            app.COLORCHANNELSButton.HorizontalAlignment = 'left';
+            app.COLORCHANNELSButton.VerticalAlignment = 'bottom';
+            app.COLORCHANNELSButton.BackgroundColor = [0.851 0.3255 0.098];
+            app.COLORCHANNELSButton.FontWeight = 'bold';
+            app.COLORCHANNELSButton.Position = [23 13 126 37];
+            app.COLORCHANNELSButton.Text = {'COLOR CHANNELS'; ''; ''};
+
+            % Create step2MorphologicalbottomhatPanel
+            app.step2MorphologicalbottomhatPanel = uipanel(app.imageprocessingPanel);
+            app.step2MorphologicalbottomhatPanel.Title = 'step 2: (Morphological bottom hat)';
+            app.step2MorphologicalbottomhatPanel.BackgroundColor = [0.651 0.651 0.651];
+            app.step2MorphologicalbottomhatPanel.Position = [197 552 210 66];
+
+            % Create BottomhatButton
+            app.BottomhatButton = uibutton(app.step2MorphologicalbottomhatPanel, 'push');
+            app.BottomhatButton.ButtonPushedFcn = createCallbackFcn(app, @BottomhatButtonPushed, true);
+            app.BottomhatButton.BackgroundColor = [0.851 0.3255 0.098];
+            app.BottomhatButton.FontWeight = 'bold';
+            app.BottomhatButton.Position = [39 12 100 22];
+            app.BottomhatButton.Text = 'Bottom hat';
+
+            % Create morphologicaltophatPanel
+            app.morphologicaltophatPanel = uipanel(app.imageprocessingPanel);
+            app.morphologicaltophatPanel.Title = 'morphological top hat';
+            app.morphologicaltophatPanel.BackgroundColor = [0.651 0.651 0.651];
+            app.morphologicaltophatPanel.Position = [197 480 210 63];
+
+            % Create TophatButton
+            app.TophatButton = uibutton(app.morphologicaltophatPanel, 'push');
+            app.TophatButton.ButtonPushedFcn = createCallbackFcn(app, @TophatButtonPushed, true);
+            app.TophatButton.BackgroundColor = [0.851 0.3255 0.098];
+            app.TophatButton.FontWeight = 'bold';
+            app.TophatButton.Position = [55 17 100 22];
+            app.TophatButton.Text = 'Top hat';
+
+            % Create step3markingPanel
+            app.step3markingPanel = uipanel(app.imageprocessingPanel);
+            app.step3markingPanel.Title = 'step 3 : marking ';
+            app.step3markingPanel.FontWeight = 'bold';
+            app.step3markingPanel.Position = [12 379 172 88];
+
+            % Create markButton
+            app.markButton = uibutton(app.step3markingPanel, 'push');
+            app.markButton.ButtonPushedFcn = createCallbackFcn(app, @markButtonPushed, true);
+            app.markButton.BackgroundColor = [0.851 0.3255 0.098];
+            app.markButton.Position = [36 33 100 22];
+            app.markButton.Text = 'mark';
+
+            % Create step4accuracyPanel
+            app.step4accuracyPanel = uipanel(app.imageprocessingPanel);
+            app.step4accuracyPanel.Title = 'step 4: accuracy';
+            app.step4accuracyPanel.FontWeight = 'bold';
+            app.step4accuracyPanel.Position = [197 379 210 88];
+
+            % Create accuracyButton
+            app.accuracyButton = uibutton(app.step4accuracyPanel, 'push');
+            app.accuracyButton.ButtonPushedFcn = createCallbackFcn(app, @accuracyButtonPushed, true);
+            app.accuracyButton.BackgroundColor = [0.851 0.3255 0.098];
+            app.accuracyButton.Position = [39 33 100 22];
+            app.accuracyButton.Text = {'accuracy'; ''};
+
+            % Create orginalimagePanel
+            app.orginalimagePanel = uipanel(app.imageprocessingPanel);
+            app.orginalimagePanel.Title = 'orginal image ';
+            app.orginalimagePanel.Position = [12 162 194 200];
+
+            % Create Image
+            app.Image = uiimage(app.orginalimagePanel);
+            app.Image.BackgroundColor = [1 1 1];
+            app.Image.HorizontalAlignment = 'right';
+            app.Image.Position = [15 27 157 148];
+
+            % Create bottomhatPanel
+            app.bottomhatPanel = uipanel(app.imageprocessingPanel);
+            app.bottomhatPanel.Title = 'bottom hat';
+            app.bottomhatPanel.Position = [230 162 188 200];
+
+            % Create Image5
+            app.Image5 = uiimage(app.bottomhatPanel);
+            app.Image5.Position = [-16 27 204 151];
+
+            % Create bloodvesslesegmentationPanel
+            app.bloodvesslesegmentationPanel = uipanel(app.imageprocessingPanel);
+            app.bloodvesslesegmentationPanel.Title = 'blood vessle segmentation';
+            app.bloodvesslesegmentationPanel.Position = [617 433 276 184];
+
+            % Create choseimageButton
+            app.choseimageButton = uibutton(app.bloodvesslesegmentationPanel, 'push');
+            app.choseimageButton.ButtonPushedFcn = createCallbackFcn(app, @choseimageButtonPushed, true);
+            app.choseimageButton.Position = [9 130 100 22];
+            app.choseimageButton.Text = 'chose image';
+
+            % Create groundtruthButton
+            app.groundtruthButton = uibutton(app.bloodvesslesegmentationPanel, 'push');
+            app.groundtruthButton.ButtonPushedFcn = createCallbackFcn(app, @groundtruthButtonPushed, true);
+            app.groundtruthButton.Position = [9 98 100 22];
+            app.groundtruthButton.Text = 'ground truth';
+
+            % Create performancevalidationButton
+            app.performancevalidationButton = uibutton(app.bloodvesslesegmentationPanel, 'push');
+            app.performancevalidationButton.ButtonPushedFcn = createCallbackFcn(app, @performancevalidationButtonPushed, true);
+            app.performancevalidationButton.Position = [9 59 139 28];
+            app.performancevalidationButton.Text = 'performance validation';
+
+            % Create overallperformanceButton
+            app.overallperformanceButton = uibutton(app.bloodvesslesegmentationPanel, 'push');
+            app.overallperformanceButton.ButtonPushedFcn = createCallbackFcn(app, @overallperformanceButtonPushed, true);
+            app.overallperformanceButton.Position = [9 17 139 31];
+            app.overallperformanceButton.Text = 'overall performance';
+
+            % Create tophatPanel
+            app.tophatPanel = uipanel(app.imageprocessingPanel);
+            app.tophatPanel.Title = 'top hat';
+            app.tophatPanel.Position = [417 443 191 175];
+
+            % Create Image5_2
+            app.Image5_2 = uiimage(app.tophatPanel);
+            app.Image5_2.Position = [0 23 201 130];
+
+            % Create orginalimagePanel_2
+            app.orginalimagePanel_2 = uipanel(app.imageprocessingPanel);
+            app.orginalimagePanel_2.Title = 'orginal image';
+            app.orginalimagePanel_2.Position = [434 228 215 185];
+
+            % Create gt1
+            app.gt1 = uiimage(app.orginalimagePanel_2);
+            app.gt1.Position = [1 1 215 165];
+
+            % Create groundtruthPanel
+            app.groundtruthPanel = uipanel(app.imageprocessingPanel);
+            app.groundtruthPanel.Title = 'ground truth';
+            app.groundtruthPanel.Position = [666 228 227 185];
+
+            % Create gt2
+            app.gt2 = uiimage(app.groundtruthPanel);
+            app.gt2.Position = [1 1 227 165];
+
+            % Create GroundtruthOUTCOMEPanel
+            app.GroundtruthOUTCOMEPanel = uipanel(app.imageprocessingPanel);
+            app.GroundtruthOUTCOMEPanel.Title = 'Ground truth(OUTCOME)';
+            app.GroundtruthOUTCOMEPanel.Position = [435 47 214 171];
+
+            % Create gt3
+            app.gt3 = uiimage(app.GroundtruthOUTCOMEPanel);
+            app.gt3.Position = [-13 13 215 127];
+
+            % Create UITable
+            app.UITable = uitable(app.imageprocessingPanel);
+            app.UITable.ColumnName = {'IMAGE'; 'NON VESSEL'; 'VESSEL'; 'TOTAL'};
+            app.UITable.RowName = {};
+            app.UITable.Position = [666 123 302 95];
+
+            % Create noofvesselcorrectlypredictedpixelLabel
+            app.noofvesselcorrectlypredictedpixelLabel = uilabel(app.imageprocessingPanel);
+            app.noofvesselcorrectlypredictedpixelLabel.Position = [904 584 218 22];
+            app.noofvesselcorrectlypredictedpixelLabel.Text = 'no of vessel correctly predicted (pixel)  :';
+
+            % Create EditField_3
+            app.EditField_3 = uieditfield(app.imageprocessingPanel, 'numeric');
+            app.EditField_3.Position = [1158 582 101 22];
+
+            % Create noofvesselmissedinpixelLabel
+            app.noofvesselmissedinpixelLabel = uilabel(app.imageprocessingPanel);
+            app.noofvesselmissedinpixelLabel.Position = [901 540 221 22];
+            app.noofvesselmissedinpixelLabel.Text = 'no of vessel missed (in pixel)                 :';
+
+            % Create EditField_2
+            app.EditField_2 = uieditfield(app.imageprocessingPanel, 'numeric');
+            app.EditField_2.Position = [1158 543 101 22];
+
+            % Create accucacycorrctlypredictedinpercentageLabel
+            app.accucacycorrctlypredictedinpercentageLabel = uilabel(app.imageprocessingPanel);
+            app.accucacycorrctlypredictedinpercentageLabel.Position = [901 492 236 22];
+            app.accucacycorrctlypredictedinpercentageLabel.Text = 'accucacy corrctly predicted(in percentage):';
+
+            % Create EditField_4
+            app.EditField_4 = uieditfield(app.imageprocessingPanel, 'numeric');
+            app.EditField_4.Position = [1158 495 107 22];
+
+            % Create sesitivityEditFieldLabel
+            app.sesitivityEditFieldLabel = uilabel(app.imageprocessingPanel);
+            app.sesitivityEditFieldLabel.HorizontalAlignment = 'right';
+            app.sesitivityEditFieldLabel.Position = [922 456 51 22];
+            app.sesitivityEditFieldLabel.Text = 'sesitivity';
+
+            % Create sesitivityEditField
+            app.sesitivityEditField = uieditfield(app.imageprocessingPanel, 'text');
+            app.sesitivityEditField.Position = [1159 456 106 22];
+
+            % Create noofvesselpredictedwronglyEditFieldLabel
+            app.noofvesselpredictedwronglyEditFieldLabel = uilabel(app.imageprocessingPanel);
+            app.noofvesselpredictedwronglyEditFieldLabel.HorizontalAlignment = 'right';
+            app.noofvesselpredictedwronglyEditFieldLabel.Position = [884 422 189 22];
+            app.noofvesselpredictedwronglyEditFieldLabel.Text = 'no of vessel predicted wrongly';
+
+            % Create noofvesselpredictedwronglyEditField
+            app.noofvesselpredictedwronglyEditField = uieditfield(app.imageprocessingPanel, 'numeric');
+            app.noofvesselpredictedwronglyEditField.Position = [1167 422 98 22];
+
+            % Create specificityEditFieldLabel
+            app.specificityEditFieldLabel = uilabel(app.imageprocessingPanel);
+            app.specificityEditFieldLabel.HorizontalAlignment = 'right';
+            app.specificityEditFieldLabel.Position = [904 372 58 22];
+            app.specificityEditFieldLabel.Text = 'specificity';
+
+            % Create specificityEditField
+            app.specificityEditField = uieditfield(app.imageprocessingPanel, 'text');
+            app.specificityEditField.Position = [1161 372 98 22];
+
+            % Create UITable_2
+            app.UITable_2 = uitable(app.imageprocessingPanel);
+            app.UITable_2.ColumnName = {''; 'NON-VESSEL'; 'VESSEL'; ''};
+            app.UITable_2.RowName = {};
+            app.UITable_2.Position = [48 23 369 95];
+
+            % Create stateEditFieldLabel
+            app.stateEditFieldLabel = uilabel(app.imageprocessingPanel);
+            app.stateEditFieldLabel.HorizontalAlignment = 'right';
+            app.stateEditFieldLabel.Position = [457 18 32 22];
+            app.stateEditFieldLabel.Text = 'state';
+
+            % Create stateEditField
+            app.stateEditField = uieditfield(app.imageprocessingPanel, 'text');
+            app.stateEditField.Position = [504 18 100 22];
+
+            % Show the figure after all components are created
+            app.UIFigure.Visible = 'on';
+        end
+    end
+
+    % App creation and deletion
+    methods (Access = public)
+
+        % Construct app
+        function app = exaduate
+
+            % Create UIFigure and components
+            createComponents(app)
+
+            % Register the app with App Designer
+            registerApp(app, app.UIFigure)
+
+            if nargout == 0
+                clear app
+            end
+        end
+
+        % Code that executes before app deletion
+        function delete(app)
+
+            % Delete UIFigure when app is deleted
+            delete(app.UIFigure)
+        end
+    end
+end
